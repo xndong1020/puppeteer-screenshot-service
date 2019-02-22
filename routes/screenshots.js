@@ -47,7 +47,7 @@ const generateImageBase64 = async (url, name) => {
     await page.keyboard.type('123456', {delay: 100})
     await page.click('#loginBtn')
     await page.goto('http://demo.teleapps.net/reports/call_status/5c6bde6405cd5342874fa6db', { waitUntil: 'networkidle2' })
-    await delay(2000)
+    // await delay(2000)
 
     console.info(`getting image from ${url}, reportId is ${name}`)
     await page.screenshot({ path: filePath, fullPage: true })
