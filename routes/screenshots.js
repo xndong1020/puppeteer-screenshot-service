@@ -9,8 +9,12 @@ const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3000/users/login'
 
 const delay = require('../utils/delay')
 
-/* GET users listing. */
-router.post('/', async function(req, res, next) {
+/* GET home page. */
+router.get('/', async (req, res, next) => {
+  res.render('index', { title: 'Screenshot Service' })
+})
+
+router.post('/', async (req, res, next) => {
   const { userID, url, reportId } = req.body
   if (!userID) return res.status(401).send()
   if (!url || !reportId) return res.status(400).send()
@@ -34,7 +38,7 @@ const generateImageBase64 = async (url, name) => {
   await page.click('#loginBtn')
   await page.goto(url, { waitUntil: 'networkidle2' })
   await delay(2000)
-  // await page.screenshot({ path: filePath, fullPage: true }) 
+  // await page.screenshot({ path: filePath, fullPage: true })
   await screenshotDOMElement(page, {
     path: filePath,
     selector: '#report-container',
