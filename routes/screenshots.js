@@ -24,7 +24,7 @@ router.post('/', async (req, res, next) => {
     console.log('Now getting image from url', url, reportId)
     res.send(imageStr)
   } catch (e) {
-    res.status(500).send(e)
+    res.status(500).send(`error when getting image from url is ${url}, reportId is ${reportId}`)
   }
 })
 
