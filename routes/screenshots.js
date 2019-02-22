@@ -44,13 +44,14 @@ const generateImageBase64 = async (url, name) => {
     await page.click('#loginBtn')
     await page.goto(url, { waitUntil: 'networkidle2' })
     await delay(5000)
-    // await page.screenshot({ path: filePath, fullPage: true })
+    
     console.info(`getting image from ${url}, reportId is ${name}`)
-    await screenshotDOMElement(page, {
-      path: filePath,
-      selector: '#report-container',
-      padding: 16
-    })
+    await page.screenshot({ path: filePath, fullPage: true })
+    // await screenshotDOMElement(page, {
+    //   path: filePath,
+    //   selector: '#report-container',
+    //   padding: 16
+    // })
     await browser.close()
     // return filePath
     const imageStr = await imageToBase64(filePath)
