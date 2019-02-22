@@ -34,6 +34,7 @@ router.post('/', async (req, res, next) => {
 const generateImageBase64 = async (url, name) => {
   const fileDirectory = path.join(__dirname, '..', 'screenshots')
   const filePath = `${fileDirectory}/${name}.jpg`
+  
 
   try {
     const browser = await puppeteer.launch({ headless: true })
@@ -45,7 +46,7 @@ const generateImageBase64 = async (url, name) => {
     await page.focus('#password')
     await page.keyboard.type('123456', {delay: 200})
     await page.click('#loginBtn')
-    await page.goto(url, { waitUntil: 'networkidle2' })
+    await page.goto('http://demo.teleapps.net/reports/call_status/5c6bde6405cd5342874fa6db', { waitUntil: 'networkidle2' })
     await delay(3000)
 
     console.info(`getting image from ${url}, reportId is ${name}`)
