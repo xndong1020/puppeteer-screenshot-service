@@ -1,0 +1,89 @@
+const express = require('express')
+const router = express.Router()
+const puppeteer = require('puppeteer')
+const path = require('path')
+const image2base64 = require('image-to-base64')
+
+require('dotenv').config()
+const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3000/users/login'
+
+const delay = require('../utils/delay')
+
+/* GET users listing. */
+router.post('/', async function(req, res, next) {
+  const { userID, url, reportId } = req.body
+  if (!userID) return res.status(401).send()
+  if (!url || !reportId) return res.status(400).send()
+
+  const imageStr = await generateImageBase64(url, reportId)
+  res.send(imageStr)
+})
+
+const generateImageBase64 = async (url, name) => {
+  const fileDirectory = path.join(__dirname, '..', 'screenshots')
+  const filePath = `${fileDirectory}/${name}.jpg`
+
+  const browser = await puppeteer.launch({ headless: true })
+  const page = await browser.newPage()
+  await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 })
+  await page.goto(LOGIN_URL)
+  await page.focus('#email')
+  await page.keyboard.type('isdance2004@hotmail.com')
+  await page.focus('#password')
+  await page.keyboard.type('123456')
+  await page.click('#loginBtn')
+  await page.goto(url, { waitUntil: 'networkidle2' })
+  await delay(2000)
+  // await page.screenshot({ path: filePath, fullPage: true }) 
+  await screenshotDOMElement(page, {
+    path: filePath,
+    selector: '#report-container',
+    padding: 16
+  })
+  await browser.close()
+  // return filePath
+  const imageStr = await imageToBase64(filePath)
+  return imageStr
+}
+
+const screenshotDOMElement = async (page, opts = {}) => {
+  const padding = 'padding' in opts ? opts.padding : 0
+  const path = 'path' in opts ? opts.path : null
+  const selector = opts.selector
+
+  if (!selector) throw Error('Please provide a selector.')
+
+  const rect = await page.evaluate(selector => {
+    const element = document.querySelector(selector)
+    if (!element) return null
+    const { x, y, width, height } = element.getBoundingClientRect()
+    return { left: x, top: y, width, height, id: element.id }
+  }, selector)
+
+  if (!rect)
+    throw Error(`Could not find element that matches selector: ${selector}.`)
+
+  return await page.screenshot({
+    path,
+    clip: {
+      x: rect.left - padding,
+      y: rect.top - padding,
+      width: rect.width + padding * 2,
+      height: rect.height + padding * 2
+    }
+  })
+}
+
+const imageToBase64 = path => {
+  return new Promise((resolve, reject) => {
+    image2base64(path) // you can also to use url
+      .then(response => {
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
+}
+
+module.exports = router
