@@ -21,10 +21,13 @@ router.post('/', async (req, res, next) => {
 
   try {
     const imageStr = await generateImageBase64(url, reportId)
-    console.log('Now getting image from url', url, reportId)
     res.send(imageStr)
   } catch (e) {
-    res.status(500).send(`error when getting image from url is ${url}, reportId is ${reportId}`)
+    res
+      .status(500)
+      .send(
+        `error when getting image from url is ${url}, reportId is ${reportId}`
+      )
   }
 })
 
@@ -36,7 +39,7 @@ const generateImageBase64 = async (url, name) => {
     const browser = await puppeteer.launch({ headless: true })
     const page = await browser.newPage()
     await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 })
-    await page.goto(LOGIN_URL)
+    await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' })
     await page.focus('#email')
     await page.keyboard.type('isdance2004@hotmail.com')
     await page.focus('#password')
@@ -44,7 +47,7 @@ const generateImageBase64 = async (url, name) => {
     await page.click('#loginBtn')
     await page.goto(url, { waitUntil: 'networkidle2' })
     await delay(5000)
-    
+
     console.info(`getting image from ${url}, reportId is ${name}`)
     await page.screenshot({ path: filePath, fullPage: true })
     // await screenshotDOMElement(page, {
