@@ -19,35 +19,44 @@ router.post('/', async (req, res, next) => {
   if (!userID) return res.status(401).send()
   if (!url || !reportId) return res.status(400).send()
 
-  const imageStr = await generateImageBase64(url, reportId)
-  res.send(imageStr)
+  try {
+    const imageStr = await generateImageBase64(url, reportId)
+    res.send(imageStr)
+  } catch (e) {
+    res.status(500).send(e)
+  }
 })
 
 const generateImageBase64 = async (url, name) => {
   const fileDirectory = path.join(__dirname, '..', 'screenshots')
   const filePath = `${fileDirectory}/${name}.jpg`
 
-  const browser = await puppeteer.launch({ headless: true })
-  const page = await browser.newPage()
-  await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 })
-  await page.goto(LOGIN_URL)
-  await page.focus('#email')
-  await page.keyboard.type('isdance2004@hotmail.com')
-  await page.focus('#password')
-  await page.keyboard.type('123456')
-  await page.click('#loginBtn')
-  await page.goto(url, { waitUntil: 'networkidle2' })
-  await delay(2000)
-  // await page.screenshot({ path: filePath, fullPage: true })
-  await screenshotDOMElement(page, {
-    path: filePath,
-    selector: '#report-container',
-    padding: 16
-  })
-  await browser.close()
-  // return filePath
-  const imageStr = await imageToBase64(filePath)
-  return imageStr
+  try {
+    const browser = await puppeteer.launch({ headless: true })
+    const page = await browser.newPage()
+    await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 })
+    await page.goto(LOGIN_URL)
+    await page.focus('#email')
+    await page.keyboard.type('isdance2004@hotmail.com')
+    await page.focus('#password')
+    await page.keyboard.type('123456')
+    await page.click('#loginBtn')
+    await page.goto(url, { waitUntil: 'networkidle2' })
+    await delay(2000)
+    // await page.screenshot({ path: filePath, fullPage: true })
+    await screenshotDOMElement(page, {
+      path: filePath,
+      selector: '#report-container',
+      padding: 16
+    })
+    await browser.close()
+    // return filePath
+    const imageStr = await imageToBase64(filePath)
+    return imageStr
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
 }
 
 const screenshotDOMElement = async (page, opts = {}) => {
