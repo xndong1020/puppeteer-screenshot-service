@@ -21,6 +21,7 @@ router.post('/', async (req, res, next) => {
 
   try {
     const imageStr = await generateImageBase64(url, reportId)
+    console.log('Now getting image from url', url, reportId)
     res.send(imageStr)
   } catch (e) {
     res.status(500).send(e)
