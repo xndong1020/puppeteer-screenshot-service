@@ -42,7 +42,7 @@ const generateImageBase64 = async (url, name) => {
     await page.keyboard.type('123456')
     await page.click('#loginBtn')
     await page.goto(url, { waitUntil: 'networkidle2' })
-    await delay(2000)
+    await delay(5000)
     // await page.screenshot({ path: filePath, fullPage: true })
     await screenshotDOMElement(page, {
       path: filePath,
