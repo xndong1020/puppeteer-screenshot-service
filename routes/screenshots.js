@@ -41,14 +41,16 @@ const generateImageBase64 = async (url, name) => {
     await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 })
     await page.goto(LOGIN_URL, { waitUntil: 'networkidle2' })
     await page.focus('#email')
-    await page.keyboard.type('isdance2004@hotmail.com', { delay: 50 })
+    await page.keyboard.type('isdance2004.yg@gmail.com', { delay: 50 })
     await page.focus('#password')
     await page.keyboard.type('123456', { delay: 50 })
     await page.click('#loginBtn')
     await delay(3000)
     await page.goto(url, { waitUntil: 'networkidle2' })
 
-    console.info(`getting image from ${url}, reportId is ${name}`)
+    console.info(
+      `login_url ${LOGIN_URL}, getting image from ${url}, reportId is ${name}`
+    )
     // await page.screenshot({ path: filePath, fullPage: true })
     await screenshotDOMElement(page, {
       path: filePath,
